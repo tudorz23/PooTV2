@@ -1,3 +1,5 @@
+package main;
+
 import checker.Checkstyle;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -235,7 +237,7 @@ public final class Test {
             }
         }
 
-        printMessage(testFileName, "Test score not found. Skipping test...");
+        printMessage(testFileName, "main.Test score not found. Skipping test...");
         return 0;
     }
 }
