@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import database.Movie;
 import database.Credentials;
+import database.Notification;
 import database.User;
 
 import java.util.ArrayList;
@@ -51,7 +52,7 @@ public class PrinterJson {
     /**
      * Converts a user object to an ObjectNode for JSON printing.
      */
-    public ObjectNode getUserNode(User user) {
+    private ObjectNode getUserNode(User user) {
         ObjectNode userNode = mapper.createObjectNode();
 
         ObjectNode credentialsNode = mapper.createObjectNode();
@@ -80,13 +81,16 @@ public class PrinterJson {
         ArrayNode ratedMoviesArrayNode = getMovieArrayNode(user.getRatedMovies());
         userNode.set("ratedMovies", ratedMoviesArrayNode);
 
+        ArrayNode notificationsArrayNode = getNotificationArrayNode(user.getNotifications());
+        userNode.set("notifications", notificationsArrayNode);
+
         return userNode;
     }
 
     /**
      * Converts an ArrayList of users to an ArrayNode for JSON printing.
      */
-    public ArrayNode getUserArrayNode(ArrayList<User> users) {
+    private ArrayNode getUserArrayNode(ArrayList<User> users) {
         ArrayNode userArrayNode = mapper.createArrayNode();
 
         for (User user : users) {
@@ -100,7 +104,7 @@ public class PrinterJson {
     /**
      * Converts a movie object to an ObjectNode for JSON printing.
      */
-    public ObjectNode getMovieNode(Movie movie) {
+    private ObjectNode getMovieNode(Movie movie) {
         ObjectNode movieNode = mapper.createObjectNode();
 
         movieNode.put("name", movie.getName());
@@ -138,7 +142,7 @@ public class PrinterJson {
     /**
      * Converts an ArrayList of movies to an ArrayNode for JSON printing.
      */
-    public ArrayNode getMovieArrayNode(ArrayList<Movie> movies) {
+    private ArrayNode getMovieArrayNode(ArrayList<Movie> movies) {
         ArrayNode movieArrayNode = mapper.createArrayNode();
 
         for (Movie movie : movies) {
@@ -147,5 +151,31 @@ public class PrinterJson {
         }
 
         return movieArrayNode;
+    }
+
+    /**
+     * Converts a notification object to an ObjectNode for JSON printing.
+     */
+    private ObjectNode getNotificationNode(Notification notification) {
+        ObjectNode notificationNode = mapper.createObjectNode();
+
+        notificationNode.put("movieName", notification.getMovieName());
+        notificationNode.put("message", notification.getMessage());
+
+        return notificationNode;
+    }
+
+    /**
+     * Converts an ArrayList of notifications to an ArrayNode for JSON printing.
+     */
+    private ArrayNode getNotificationArrayNode(ArrayList<Notification> notifications) {
+        ArrayNode notificationArrayNode = mapper.createArrayNode();
+
+        for (Notification notification : notifications) {
+            ObjectNode notificationNode = getNotificationNode(notification);
+            notificationArrayNode.add(notificationNode);
+        }
+
+        return notificationArrayNode;
     }
 }

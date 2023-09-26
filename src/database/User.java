@@ -13,6 +13,8 @@ public final class User {
     private ArrayList<Movie> watchedMovies;
     private ArrayList<Movie> likedMovies;
     private ArrayList<Movie> ratedMovies;
+    private ArrayList<Notification> notifications;
+    private ArrayList<String> subscribedGenres;
 
     /* Constructor */
     public User(Credentials credentials) {
@@ -23,6 +25,8 @@ public final class User {
         watchedMovies = new ArrayList<>();
         likedMovies = new ArrayList<>();
         ratedMovies = new ArrayList<>();
+        notifications = new ArrayList<>();
+        subscribedGenres = new ArrayList<>();
     }
 
     /**
@@ -123,5 +127,17 @@ public final class User {
     }
     public void setRatedMovies(ArrayList<Movie> ratedMovies) {
         this.ratedMovies = ratedMovies;
+    }
+    public ArrayList<Notification> getNotifications() {
+        return notifications;
+    }
+    public void setNotifications(ArrayList<Notification> notifications) {
+        this.notifications = notifications;
+    }
+    public ArrayList<String> getSubscribedGenres() {
+        return subscribedGenres;
+    }
+    public void setSubscribedGenres(ArrayList<String> subscribedGenres) {
+        this.subscribedGenres = subscribedGenres;
     }
 }
