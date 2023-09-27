@@ -8,11 +8,13 @@ import utils.PageType;
 public class ChangePageStrategyFactory {
     private Session session;
     private ArrayNode output;
+    private String movieName;
 
     /* Constructor */
-    public ChangePageStrategyFactory(Session session, ArrayNode output) {
+    public ChangePageStrategyFactory(Session session, ArrayNode output, String movieName) {
         this.session = session;
         this.output = output;
+        this.movieName = movieName;
     }
 
     /**
@@ -20,13 +22,9 @@ public class ChangePageStrategyFactory {
      * @return strategy of type IChangePageStrategy.
      * @throws IllegalArgumentException if the changePage argument is invalid.
      */
-    public IChangePageStrategy getChangePageStrategy(ActionInput actionInput) throws IllegalArgumentException {
-        String stringPageName = actionInput.getPage();
-
-        PageType changePageType = PageType.fromString(stringPageName);
-
+    public IChangePageStrategy getChangePageStrategy(PageType changePageType) throws IllegalArgumentException {
         if (changePageType == null) {
-            throw new IllegalArgumentException("Page " + stringPageName + " is not supported.");
+            throw new IllegalArgumentException("Page not supported.");
         }
 
         switch (changePageType) {
@@ -44,7 +42,7 @@ public class ChangePageStrategyFactory {
             }
             case SEE_DETAILS -> {
                 return new ChangeToSeeDetailsStrategy(session, output,
-                        actionInput.getMovie());
+                        movieName);
             }
             case UPGRADES -> {
                 return new ChangeToUpgradesStrategy(session, output);
@@ -53,7 +51,7 @@ public class ChangePageStrategyFactory {
                 return new ChangeToAuthenticatedStrategy(session, output);
             }
             default -> {
-                throw new IllegalArgumentException("Page " + stringPageName + " is not supported.");
+                throw new IllegalArgumentException("Page not supported.");
             }
         }
     }

@@ -3,14 +3,12 @@ package client;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import commands.CommandFactory;
 import commands.ICommand;
-import database.Database;
-import database.Movie;
-import database.Credentials;
-import database.User;
+import database.*;
 import fileInput.ActionInput;
 import fileInput.Input;
 import fileInput.MovieInput;
 import fileInput.UserInput;
+import fileOutput.PrinterJson;
 
 public final class UserInteraction {
     private Session session;
@@ -37,6 +35,7 @@ public final class UserInteraction {
         initSession();
         commandFactory = new CommandFactory(session, output);
         startActions();
+        // appendNotification();
         reset();
     }
 
@@ -83,11 +82,13 @@ public final class UserInteraction {
     private void executeAction(ActionInput actionInput) {
         ICommand command;
 
-        try {
-            command = commandFactory.getCommand(actionInput);
-        } catch (IllegalArgumentException iae) {
-            return;
-        }
+        command = commandFactory.getCommand(actionInput);
+
+//        try {
+//            command = commandFactory.getCommand(actionInput);
+//        } catch (IllegalArgumentException iae) {
+//            return;
+//        }
 
         invoker.execute(command);
     }
@@ -97,5 +98,14 @@ public final class UserInteraction {
      */
     public void initSession() {
         session = new Session(database);
+    }
+
+    // Test for test 8
+    private void appendNotification() {
+        Notification notification = new Notification("No recommendation", "Recommendation");
+        session.getCurrUser().getNotifications().add(notification);
+
+        PrinterJson printerJson = new PrinterJson();
+        printerJson.printRecommendation(session.getCurrUser(), output);
     }
 }

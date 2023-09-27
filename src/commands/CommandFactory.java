@@ -22,20 +22,33 @@ public class CommandFactory {
      * @throws IllegalArgumentException if command is not supported.
      */
     public ICommand getCommand(ActionInput actionInput) throws IllegalArgumentException {
-        // If it is a "change page" command.
-        if (actionInput.getType().equals("change page")) {
-            return new ChangePageCommand(session, actionInput, output);
+        CommandType commandType = CommandType.fromString(actionInput.getType());
+        if (commandType == null) {
+            throw new IllegalArgumentException("Command " + actionInput.getType()
+                        + " not yet implemented.");
+        }
+
+        switch (commandType) {
+            case CHANGE_PAGE -> {
+                return new ChangePageCommand(session, actionInput, output);
+            }
+            case BACK -> {
+                return new BackCommand(session, output);
+            }
+            case ON_PAGE -> {}
+            default -> throw new IllegalArgumentException("Command " + actionInput.getType()
+                    + " not yet implemented.");
         }
 
         // Now, it surely is an "on page" command.
-        CommandType commandType = CommandType.fromString(actionInput.getFeature());
+        CommandType commandFeature = CommandType.fromString(actionInput.getFeature());
 
-        if (commandType == null) {
+        if (commandFeature == null) {
             throw new IllegalArgumentException("Command " + actionInput.getFeature()
                         + " is not supported.");
         }
 
-        switch (commandType) {
+        switch (commandFeature) {
             case LOGIN -> {
                 return new LoginCommand(session, actionInput, output);
             }

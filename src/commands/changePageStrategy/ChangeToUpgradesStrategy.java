@@ -18,15 +18,19 @@ public class ChangeToUpgradesStrategy implements IChangePageStrategy {
         this.output = output;
     }
 
-
     @Override
     public void changePage() {
-        if (!testValidity()) {
+        if (!testChangePageValidity()) {
             return;
         }
 
         PageFactory pageFactory = new PageFactory();
         newPage = pageFactory.createPage(PageType.UPGRADES);
+
+        // Push previous page on the page stack.
+        Page previousPage = session.getCurrPage();
+        session.pushPageStack(previousPage);
+
         session.setCurrPage(newPage);
     }
 
@@ -34,12 +38,19 @@ public class ChangeToUpgradesStrategy implements IChangePageStrategy {
      * Checks if the changePage command is valid.
      * @return true if it is valid, false otherwise.
      */
-    private boolean testValidity() {
+    private boolean testChangePageValidity() {
         if (!session.getCurrPage().getNextPages().contains(PageType.UPGRADES)) {
             PrinterJson errorPrinter = new PrinterJson();
             errorPrinter.printError(output);
             return false;
         }
         return true;
+    }
+
+    @Override
+    public void back() {
+        PageFactory pageFactory = new PageFactory();
+        newPage = pageFactory.createPage(PageType.UPGRADES);
+        session.setCurrPage(newPage);
     }
 }

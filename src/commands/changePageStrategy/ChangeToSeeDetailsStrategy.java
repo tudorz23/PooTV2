@@ -9,6 +9,8 @@ import pages.PageFactory;
 import pages.SeeDetailsPage;
 import utils.PageType;
 
+import java.util.ArrayList;
+
 public class ChangeToSeeDetailsStrategy implements IChangePageStrategy {
     private Session session;
     private ArrayNode output;
@@ -26,7 +28,7 @@ public class ChangeToSeeDetailsStrategy implements IChangePageStrategy {
     public void changePage() {
         PrinterJson printerJson = new PrinterJson();
 
-        if (!testValidity()) {
+        if (!testChangePageValidity()) {
             printerJson.printError(output);
             return;
         }
@@ -34,49 +36,77 @@ public class ChangeToSeeDetailsStrategy implements IChangePageStrategy {
         PageFactory pageFactory = new PageFactory();
         newPage = pageFactory.createPage(PageType.SEE_DETAILS);
 
-        if (!copyMovie()) {
+        // Search in the currently displayed movie list for the wanted movie.
+        Movie wantedMovie = findMovieInList(session.getCurrMovieList());
+
+        if (wantedMovie == null) {
             printerJson.printError(output);
             return;
         }
 
-        session.setCurrPage(newPage);
-        printerJson.printSuccess(session.getCurrMovieList(),
-                                    session.getCurrUser(), output);
+        // Push previous page on the page stack.
+        Page previousPage = session.getCurrPage();
+        session.pushPageStack(previousPage);
+
+        setWantedMovie(wantedMovie);
     }
 
     /**
      * Checks if the changePage command is valid.
      * @return true if it is valid, false otherwise.
      */
-    private boolean testValidity() {
+    private boolean testChangePageValidity() {
         // SeeDetailsPage can only be accessed from MoviesPage.
-        if (session.getCurrPage().getType() != PageType.MOVIES) {
-            return false;
+        return session.getCurrPage().getType() == PageType.MOVIES;
+    }
+
+    @Override
+    public void back() {
+        PrinterJson printerJson = new PrinterJson();
+
+        PageFactory pageFactory = new PageFactory();
+        newPage = pageFactory.createPage(PageType.SEE_DETAILS);
+
+        // The wanted movie might have since been deleted from the database,
+        // but, if it is still there, it surely still is visible to the current user.
+        Movie wantedMovie = findMovieInList(session.getDatabase().getAvailableMovies());
+
+        if (wantedMovie == null) {
+            printerJson.printError(output);
+            return;
         }
-        return true;
+
+        setWantedMovie(wantedMovie);
     }
 
     /**
-     * Selects the movie with the respective title from the currently displayed movie list
+     * Selects the movie with the respective title from the passed list param
      * and sets it as new page's movie and session's current movie.
-     * @return true if the movie is found, false otherwise.
+     * @param movieList list to search for the movie.
+     * @return the wanted Movie object if it is found, null otherwise.
      */
-    private boolean copyMovie() {
-        for (Movie movie : session.getCurrMovieList()) {
+    private Movie findMovieInList(ArrayList<Movie> movieList) {
+        for (Movie movie : movieList) {
             if (movie.getName().equals(movieName)) {
-                ((SeeDetailsPage) newPage).setMovie(movie);
-                break;
+                return movie;
             }
         }
+        return null;
+    }
 
-        // Check if the movie is found.
-        if (((SeeDetailsPage) newPage).getMovie() == null) {
-            return false;
-        }
-
+    /**
+     * Sets the Page's movie and the session's currently displayed movie  to the given movie.
+     * @param wantedMovie movie to set to.
+     */
+    private void setWantedMovie(Movie wantedMovie) {
+        ((SeeDetailsPage) newPage).setMovie(wantedMovie);
         session.resetCurrMovieList();
-        session.getCurrMovieList().add(((SeeDetailsPage) newPage).getMovie());
+        session.getCurrMovieList().add(wantedMovie);
 
-        return true;
+        session.setCurrPage(newPage);
+
+        PrinterJson printerJson = new PrinterJson();
+        printerJson.printSuccess(session.getCurrMovieList(),
+                                    session.getCurrUser(), output);
     }
 }

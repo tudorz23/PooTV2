@@ -49,6 +49,19 @@ public class PrinterJson {
         output.add(errorMessage);
     }
 
+    // Test for test 8
+    public void printRecommendation(User user, ArrayNode output) {
+        ObjectNode message = mapper.createObjectNode();
+
+        message.put("error", (String) null);
+        message.put("currentMoviesList", (String) null);
+
+        ObjectNode currentUser = getUserNode(user);
+        message.set("currentUser", currentUser);
+
+        output.add(message);
+    }
+
     /**
      * Converts a user object to an ObjectNode for JSON printing.
      */
@@ -108,7 +121,7 @@ public class PrinterJson {
         ObjectNode movieNode = mapper.createObjectNode();
 
         movieNode.put("name", movie.getName());
-        movieNode.put("year", movie.getYear());
+        movieNode.put("year", String.valueOf(movie.getYear()));
         movieNode.put("duration", movie.getDuration());
 
         // Add the genres as an ArrayNode.
