@@ -82,6 +82,9 @@ public class CommandFactory {
             case RATE -> {
                 return new RateCommand(session, actionInput, output);
             }
+            case SUBSCRIBE -> {
+                return new SubscribeCommand(session, actionInput, output);
+            }
             default -> throw new IllegalArgumentException("Command is not supported.");
         }
     }

@@ -14,7 +14,8 @@ public enum CommandType {
     LIKE("like"),
     RATE("rate"),
     LOGOUT("logout"),
-    BACK("back");
+    BACK("back"),
+    SUBSCRIBE("subscribe");
 
     private final String label;
 
