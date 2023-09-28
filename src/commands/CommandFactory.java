@@ -35,6 +35,9 @@ public class CommandFactory {
             case BACK -> {
                 return new BackCommand(session, output);
             }
+            case DATABASE -> {
+                return new DatabaseCommand(session, actionInput, output);
+            }
             case ON_PAGE -> {}
             default -> throw new IllegalArgumentException("Command " + actionInput.getType()
                     + " not yet implemented.");

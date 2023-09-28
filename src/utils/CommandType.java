@@ -15,7 +15,8 @@ public enum CommandType {
     RATE("rate"),
     LOGOUT("logout"),
     BACK("back"),
-    SUBSCRIBE("subscribe");
+    SUBSCRIBE("subscribe"),
+    DATABASE("database");
 
     private final String label;
 

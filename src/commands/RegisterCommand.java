@@ -48,6 +48,7 @@ public class RegisterCommand implements ICommand {
         Credentials newCredentials = new Credentials(actionInput.getCredentials());
         User newUser = new User(newCredentials);
         session.getDatabase().getRegisteredUsers().add(newUser);
+        session.getDatabase().addObserver(newUser);
 
         // Set the new user in the session and move to Authenticated Homepage.
         session.setCurrUser(newUser);

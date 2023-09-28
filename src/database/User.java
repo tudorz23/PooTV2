@@ -1,11 +1,14 @@
 package database;
 
+import database.observer.IObserver;
+import fileInput.ActionInput;
+
 import java.util.ArrayList;
 import java.util.Objects;
-import static utils.Constants.INITIAL_FREE_PREMIUM_MOVIES;
-import static utils.Constants.PREMIUM_ACCOUNT_PRICE;
 
-public final class User {
+import static utils.Constants.*;
+
+public final class User implements IObserver {
     private Credentials credentials;
     private int tokensCount;
     private int numFreePremiumMovies;
@@ -66,6 +69,95 @@ public final class User {
         this.getCredentials().setAccountType("premium");
 
         return true;
+    }
+
+    @Override
+    public void update(ActionInput news) {
+        if (news.getFeature().equals("add")) {
+            updateAddMovie(new Movie(news.getAddedMovie()));
+        } else if (news.getFeature().equals("delete")) {
+            updateDeleteMovie(news.getDeletedMovie());
+        }
+    }
+
+    /**
+     * Helper update method for when a new movie is added.
+     * @param newMovie added movie.
+     */
+    private void updateAddMovie(Movie newMovie) {
+        if ((!checkSubscribeStatus(newMovie)) || checkCountryBanStatus(newMovie)) {
+            return;
+        }
+
+        Notification notification = new Notification(newMovie.getName(), "ADD");
+        this.getNotifications().add(notification);
+    }
+
+    /**
+     * Checks if this user is subscribed to at least one of the new movie's genres.
+     * @return true if he is, false otherwise.
+     */
+    private boolean checkSubscribeStatus(Movie newMovie) {
+        for (String genre : newMovie.getGenres()) {
+            if (this.getSubscribedGenres().contains(genre)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks if the new movie is banned in current user's country.
+     * @return true if it is banned, false otherwise.
+     */
+    private boolean checkCountryBanStatus(Movie newMovie) {
+        return newMovie.getCountriesBanned().contains(this.getCredentials().getCountry());
+    }
+
+    /**
+     * Helper update method for when a movie is deleted.
+     * @param deletedMovie added movie.
+     */
+    private void updateDeleteMovie(String deletedMovie) {
+       if (!checkIfMovieIsPurchased(deletedMovie)) {
+           return;
+       }
+
+       returnMovieValue();
+
+       this.getPurchasedMovies().removeIf(movie -> movie.getName().equals(deletedMovie));
+       this.getWatchedMovies().removeIf(movie -> movie.getName().equals(deletedMovie));
+       this.getLikedMovies().removeIf(movie -> movie.getName().equals(deletedMovie));
+       this.getRatedMovies().removeIf(movie -> movie.getName().equals(deletedMovie));
+
+       Notification notification = new Notification(deletedMovie, "DELETE");
+       this.getNotifications().add(notification);
+    }
+
+    /**
+     * Checks if this user has purchased the movie.
+     * @return true if he has, false otherwise.
+     */
+    private boolean checkIfMovieIsPurchased(String movieName) {
+        return this.getPurchasedMovies().stream()
+                .anyMatch(movie -> movie.getName().equals(movieName));
+    }
+
+    /**
+     * Gives the user compensations for the deleted movie.
+     */
+    private void returnMovieValue() {
+        if (this.getCredentials().getAccountType().equals("premium")) {
+            int currNumFreePremiumMovies = this.getNumFreePremiumMovies();
+            currNumFreePremiumMovies++;
+            this.setNumFreePremiumMovies(currNumFreePremiumMovies);
+            return;
+        }
+
+        // If the user is standard.
+        int currTokensCnt = this.getTokensCount();
+        currTokensCnt += MOVIE_PRICE;
+        this.setTokensCount(currTokensCnt);
     }
 
     @Override
@@ -136,8 +228,5 @@ public final class User {
     }
     public ArrayList<String> getSubscribedGenres() {
         return subscribedGenres;
-    }
-    public void setSubscribedGenres(ArrayList<String> subscribedGenres) {
-        this.subscribedGenres = subscribedGenres;
     }
 }

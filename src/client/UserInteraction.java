@@ -50,6 +50,7 @@ public final class UserInteraction {
             Credentials credentials = new Credentials(userInput.getCredentials());
             User user = new User(credentials);
             database.getRegisteredUsers().add(user);
+            database.addObserver(user);
         }
 
         // Populate database with available movies.
