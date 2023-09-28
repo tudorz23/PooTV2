@@ -39,8 +39,9 @@ public class DatabaseAddStrategy implements IDatabaseStrategy {
      */
     private boolean checkMovieExistenceInDatabase(Movie newMovie) {
         for (Movie movie : session.getDatabase().getAvailableMovies()) {
-            if (movie.getName().equals(newMovie.getName()))
+            if (movie.getName().equals(newMovie.getName())) {
                 return true;
+            }
         }
         return false;
     }

@@ -39,8 +39,9 @@ public class DatabaseDeleteStrategy implements IDatabaseStrategy {
      */
     private boolean checkMovieExistenceInDatabase(String movieName) {
         for (Movie movie : session.getDatabase().getAvailableMovies()) {
-            if (movie.getName().equals(movieName))
+            if (movie.getName().equals(movieName)) {
                 return true;
+            }
         }
         return false;
     }

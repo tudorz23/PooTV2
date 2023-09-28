@@ -35,7 +35,9 @@ public class RecommendationCommand implements ICommand {
 
         getGenresTop();
         getMoviesTop();
-        
+
+        // Iterate through the genres top, then find the most liked movie
+        // from that genre that has not been watched by the user.
         for (String genre : genresTop.keySet()) {
             for (Movie movie : moviesTop) {
                 if (movie.getGenres().contains(genre)) {
