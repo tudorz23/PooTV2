@@ -42,4 +42,11 @@ public class ChangeToRegisterStrategy implements IChangePageStrategy {
         }
         return true;
     }
+
+     @Override
+    public void back() {
+         // Cannot go back to Register Page while there is still a logged-in user.
+         PrinterJson printerJson = new PrinterJson();
+         printerJson.printError(output);
+    }
 }

@@ -43,14 +43,14 @@ public class RateCommand implements ICommand {
 
         if (!currUser.getRatedMovies().contains(movie)) {
             currUser.getRatedMovies().add(movie);
+
+            int currNumRatings = movie.getNumRatings();
+            currNumRatings++;
+            movie.setNumRatings(currNumRatings);
         }
 
         // Register the new rating.
         movie.getRatingsMap().put(currUser, newRating);
-
-        int currNumRatings = movie.getNumRatings();
-        currNumRatings++;
-        movie.setNumRatings(currNumRatings);
 
         movie.computeRating();
 

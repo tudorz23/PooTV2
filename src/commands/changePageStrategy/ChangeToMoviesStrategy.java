@@ -23,12 +23,17 @@ public class ChangeToMoviesStrategy implements IChangePageStrategy {
 
     @Override
     public void changePage() {
-        if (!testValidity()) {
+        if (!testChangePageValidity()) {
             return;
         }
 
         PageFactory pageFactory = new PageFactory();
         newPage = pageFactory.createPage(PageType.MOVIES);
+
+        // Push previous page on the page stack.
+        Page previousPage = session.getCurrPage();
+        session.pushPageStack(previousPage);
+
         session.setCurrPage(newPage);
         copyMovies();
 
@@ -41,7 +46,7 @@ public class ChangeToMoviesStrategy implements IChangePageStrategy {
      * Checks if the changePage command is valid.
      * @return true if it is valid, false otherwise.
      */
-    private boolean testValidity() {
+    private boolean testChangePageValidity() {
         if (!session.getCurrPage().getNextPages().contains(PageType.MOVIES)) {
             PrinterJson errorPrinter = new PrinterJson();
             errorPrinter.printError(output);
@@ -69,5 +74,17 @@ public class ChangeToMoviesStrategy implements IChangePageStrategy {
         for (Movie movie : ((MoviesPage) newPage).getMovies()) {
             session.getCurrMovieList().add(movie);
         }
+    }
+
+    @Override
+    public void back() {
+        PageFactory pageFactory = new PageFactory();
+        newPage = pageFactory.createPage(PageType.MOVIES);
+        session.setCurrPage(newPage);
+        copyMovies();
+
+        PrinterJson successPrinter = new PrinterJson();
+        successPrinter.printSuccess(session.getCurrMovieList(),
+                session.getCurrUser(), output);
     }
 }

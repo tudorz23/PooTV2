@@ -19,27 +19,40 @@ public class ChangeToAuthenticatedStrategy implements IChangePageStrategy {
 
     @Override
     public void changePage() {
-        if (!testValidity()) {
+        if (!testChangePageValidity()) {
             return;
         }
 
         PageFactory pageFactory = new PageFactory();
         Page newPage = pageFactory.createPage(PageType.AUTHENTICATED);
-        session.setCurrPage(newPage);
 
-        session.getCurrMovieList().clear();
+        // Push previous page on the page stack.
+        Page previousPage = session.getCurrPage();
+        session.pushPageStack(previousPage);
+
+        session.setCurrPage(newPage);
+        session.resetCurrMovieList();
     }
 
     /**
      * Checks if the changePage command is valid.
      * @return true if it is valid, false otherwise.
      */
-    private boolean testValidity() {
+    private boolean testChangePageValidity() {
         if (!session.getCurrPage().getNextPages().contains(PageType.AUTHENTICATED)) {
             PrinterJson errorPrinter = new PrinterJson();
             errorPrinter.printError(output);
             return false;
         }
         return true;
+    }
+
+    @Override
+    public void back() {
+        PageFactory pageFactory = new PageFactory();
+        Page backPage = pageFactory.createPage(PageType.AUTHENTICATED);
+        session.setCurrPage(backPage);
+
+        session.resetCurrMovieList();
     }
 }

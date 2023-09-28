@@ -29,6 +29,9 @@ public class ChangeToUnauthenticatedStrategy implements IChangePageStrategy {
         PageFactory pageFactory = new PageFactory();
         newPage = pageFactory.createPage(PageType.UNAUTHENTICATED);
         session.setCurrPage(newPage);
+
+        // Reset the page stack after logout.
+        session.resetPageStack();
     }
 
     /**
@@ -42,5 +45,12 @@ public class ChangeToUnauthenticatedStrategy implements IChangePageStrategy {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public void back() {
+        // Cannot go back to Unauthenticated Homepage while there is still a logged-in user.
+        PrinterJson printerJson = new PrinterJson();
+        printerJson.printError(output);
     }
 }

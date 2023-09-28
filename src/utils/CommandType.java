@@ -2,6 +2,7 @@ package utils;
 
 public enum CommandType {
     CHANGE_PAGE("change page"),
+    ON_PAGE("on page"),
     REGISTER("register"),
     LOGIN("login"),
     SEARCH("search"),
@@ -12,7 +13,10 @@ public enum CommandType {
     WATCH("watch"),
     LIKE("like"),
     RATE("rate"),
-    LOGOUT("logout");
+    LOGOUT("logout"),
+    BACK("back"),
+    SUBSCRIBE("subscribe"),
+    DATABASE("database");
 
     private final String label;
 

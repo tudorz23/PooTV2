@@ -3,14 +3,13 @@ package client;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import commands.CommandFactory;
 import commands.ICommand;
-import database.Database;
-import database.Movie;
-import database.Credentials;
-import database.User;
+import commands.RecommendationCommand;
+import database.*;
 import fileInput.ActionInput;
 import fileInput.Input;
 import fileInput.MovieInput;
 import fileInput.UserInput;
+import fileOutput.PrinterJson;
 
 public final class UserInteraction {
     private Session session;
@@ -37,6 +36,7 @@ public final class UserInteraction {
         initSession();
         commandFactory = new CommandFactory(session, output);
         startActions();
+        checkRecommendation();
         reset();
     }
 
@@ -51,6 +51,7 @@ public final class UserInteraction {
             Credentials credentials = new Credentials(userInput.getCredentials());
             User user = new User(credentials);
             database.getRegisteredUsers().add(user);
+            database.addObserver(user);
         }
 
         // Populate database with available movies.
@@ -97,5 +98,13 @@ public final class UserInteraction {
      */
     public void initSession() {
         session = new Session(database);
+    }
+
+    /**
+     * Initiates the checking for a recommendation.
+     */
+    private void checkRecommendation() {
+        RecommendationCommand recommendationCommand = new RecommendationCommand(session, output);
+        recommendationCommand.execute();
     }
 }

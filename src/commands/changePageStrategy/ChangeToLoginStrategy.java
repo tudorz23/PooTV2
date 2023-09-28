@@ -20,7 +20,7 @@ public class ChangeToLoginStrategy implements IChangePageStrategy {
 
     @Override
     public void changePage() {
-        if (!testValidity()) {
+        if (!testChangePageValidity()) {
             return;
         }
 
@@ -34,12 +34,19 @@ public class ChangeToLoginStrategy implements IChangePageStrategy {
      * Checks if the changePage command is valid.
      * @return true if it is valid, false otherwise.
      */
-    private boolean testValidity() {
+    private boolean testChangePageValidity() {
         if (!session.getCurrPage().getNextPages().contains(PageType.LOGIN)) {
             PrinterJson errorPrinter = new PrinterJson();
             errorPrinter.printError(output);
             return false;
         }
         return true;
+    }
+
+    @Override
+    public void back() {
+        // Cannot go back to Login Page while there is still a logged-in user.
+        PrinterJson printerJson = new PrinterJson();
+        printerJson.printError(output);
     }
 }
