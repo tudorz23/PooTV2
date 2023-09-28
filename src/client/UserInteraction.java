@@ -3,6 +3,7 @@ package client;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import commands.CommandFactory;
 import commands.ICommand;
+import commands.RecommendationCommand;
 import database.*;
 import fileInput.ActionInput;
 import fileInput.Input;
@@ -35,7 +36,7 @@ public final class UserInteraction {
         initSession();
         commandFactory = new CommandFactory(session, output);
         startActions();
-        // appendNotification();
+        checkRecommendation();
         reset();
     }
 
@@ -83,13 +84,11 @@ public final class UserInteraction {
     private void executeAction(ActionInput actionInput) {
         ICommand command;
 
-        command = commandFactory.getCommand(actionInput);
-
-//        try {
-//            command = commandFactory.getCommand(actionInput);
-//        } catch (IllegalArgumentException iae) {
-//            return;
-//        }
+        try {
+            command = commandFactory.getCommand(actionInput);
+        } catch (IllegalArgumentException iae) {
+            return;
+        }
 
         invoker.execute(command);
     }
@@ -101,12 +100,11 @@ public final class UserInteraction {
         session = new Session(database);
     }
 
-    // Test for test 8
-    private void appendNotification() {
-        Notification notification = new Notification("No recommendation", "Recommendation");
-        session.getCurrUser().getNotifications().add(notification);
-
-        PrinterJson printerJson = new PrinterJson();
-        printerJson.printRecommendation(session.getCurrUser(), output);
+    /**
+     * Initiates the checking for a recommendation.
+     */
+    private void checkRecommendation() {
+        RecommendationCommand recommendationCommand = new RecommendationCommand(session, output);
+        recommendationCommand.execute();
     }
 }
