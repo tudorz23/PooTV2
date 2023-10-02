@@ -3,6 +3,7 @@ package commands.changePageStrategy;
 import client.Session;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import database.Movie;
+import database.User;
 import fileOutput.PrinterJson;
 import pages.Page;
 import pages.PageFactory;
@@ -68,10 +69,14 @@ public class ChangeToSeeDetailsStrategy implements IChangePageStrategy {
         newPage = pageFactory.createPage(PageType.SEE_DETAILS);
 
         // The wanted movie might have since been deleted from the database,
-        // but, if it is still there, it surely still is visible to the current user.
+        // so, we search for the movie in the whole database.
         Movie wantedMovie = findMovieInList(session.getDatabase().getAvailableMovies());
 
-        if (wantedMovie == null) {
+        // Since the movie was not selected from the Movies Page of the current user,
+        // it is necessary to check if it is available in the user's country.
+        String currUserCountry = session.getCurrUser().getCredentials().getCountry();
+
+        if (wantedMovie == null || wantedMovie.getCountriesBanned().contains(currUserCountry)) {
             printerJson.printError(output);
             return;
         }
